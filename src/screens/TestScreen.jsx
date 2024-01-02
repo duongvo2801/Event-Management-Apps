@@ -1,0 +1,84 @@
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+
+import Icon from '../components/common/Icon';
+import IconButton from '../components/common/IconButton';
+import IconTextButton from '../components/common/IconTextButton';
+import { Color } from '../components/styles/GlobalStyles';
+
+const TestScreen = () => {
+  const handleButtonPress = () => {
+    // Handle button press
+    console.log('Button Pressed!');
+  };
+
+  return (
+    <View style={styles.container}>
+      <Icon
+        source={require('../assets/icons/BadgeOutline.png')}
+        color={Color.primary}
+        size="small"
+      />
+      <Icon source={require('../assets/icons/BadgeOutline.png')} color={Color.secondary} />
+      <Icon source={require('../assets/icons/Check.png')} />
+      <IconButton
+        onPress={handleButtonPress}
+        iconSource={require('../assets/icons/BadgeOutline.png')}
+        style={styles.buttonStyle}
+        showShadow
+      />
+      <IconButton
+        onPress={handleButtonPress}
+        iconSource={require('../assets/icons/BadgeOutline.png')}
+        isSizeSmall
+        style={styles.buttonStyle}
+      />
+
+      <IconTextButton
+        onPress={handleButtonPress}
+        label="Button 1"
+        iconLeft={require('../assets/icons/Plus.png')}
+        iconRight={require('../assets/icons/BadgeOutline.png')}
+        buttonColor={Color.primary}
+        showShadow
+        isSmall={false}
+        isFillLayout={false}
+        style={styles.buttonStyle}
+      />
+
+      <IconTextButton
+        onPress={handleButtonPress}
+        label="Button 2"
+        iconLeft={require('../assets/icons/Edit.png')}
+        textColor={Color.primary}
+        buttonColor={Color.secondary}
+        showShadow
+        isFillLayout={false}
+        style={styles.buttonStyle}
+      />
+
+      <IconTextButton
+        onPress={handleButtonPress}
+        label="Button 3"
+        iconRight={require('../assets/icons/Check.png')}
+        isFillLayout
+        showShadow
+        style={styles.buttonStyle}
+      />
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+  },
+  buttonStyle: {
+    marginBottom: 16,
+  },
+});
+
+export default TestScreen;
