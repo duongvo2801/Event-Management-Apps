@@ -1,5 +1,5 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import * as ImagePicker from 'expo-image-picker';
 import React, { useContext, useEffect, useState } from 'react';
 import {
   View,
@@ -7,7 +7,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   Text,
-  TextInput,
   Dimensions,
   StatusBar,
   ScrollView,
@@ -15,9 +14,56 @@ import {
 
 import Icon from '../components/common/Icon';
 import { Color, Padding } from '../components/styles/GlobalStyles';
+import { axiosAuthGet } from '../configs';
+import { accessTokenKey } from '../constants/constant';
 import { AppContext } from '../contexts/AppContext';
 
 const { height, width } = Dimensions.get('window');
+
+const Toolbar = () => {
+  const [dataAvatar, setDataAvatar] = useState('');
+  const [dataFullName, setDataFullName] = useState('');
+  const [checkData, setCheckData] = useState({});
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      fetchData();
+    }, 1000);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [checkData]);
+  const fetchData = async () => {
+    try {
+      const accessToken = await AsyncStorage.getItem(accessTokenKey);
+      const response = await axiosAuthGet('/employee/get-employee-profile', accessToken);
+
+      if (response && response.data && response.data.employee) {
+        const { name, avatar } = response.data.employee;
+        setDataFullName(name);
+        setDataAvatar(avatar);
+      } else {
+        // Xử lý trường hợp không có dữ liệu nhân viên
+        console.error('Không có dữ liệu nhân viên trong response');
+      }
+    } catch (error) {
+      // Xử lý lỗi khi gọi API
+      console.error('Lỗi khi gọi API:', error);
+    }
+  };
+
+  return (
+    <View style={styles.infoImage}>
+      <Image
+        style={styles.avatar}
+        resizeMode="cover"
+        source={dataAvatar ? { uri: dataAvatar } : require('../assets/icons/AddAvatar.jpeg')}
+      />
+      <Text style={styles.textInfo}>{dataFullName}</Text>
+    </View>
+  );
+};
 
 const MyStatusBar = ({ backgroundColor, ...props }) => (
   <View style={[styles.statusBar, { backgroundColor }]}>
@@ -27,25 +73,10 @@ const MyStatusBar = ({ backgroundColor, ...props }) => (
 
 const ProfileScreen = () => {
   const navigation = useNavigation();
-  const { setIsLogin, pagination, loadingFooter } = useContext(AppContext);
-  const [dataAvatar, setDataAvatar] = useState('');
-  const [dataFullName, setDataFullName] = useState('');
+  const { setIsLogin } = useContext(AppContext);
 
   const handleLogOut = async () => {
     setIsLogin(false);
-  };
-
-  const Toolbar = () => {
-    return (
-      <View style={styles.infoImage}>
-        <Image
-          style={styles.avatar}
-          resizeMode="cover"
-          source={dataAvatar ? { uri: dataAvatar } : require('../assets/icons/AddAvatar.jpeg')}
-        />
-        <Text style={styles.textInfo}>dataFullName</Text>
-      </View>
-    );
   };
 
   return (

@@ -1,23 +1,23 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
-import React, { useState, useEffect } from 'react';
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useContext } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
 
 import DummyDataEmployee from './employees/DummyDataEmployee';
 import List from './employees/ListEmployee';
 import { SearchBar } from '../components/common';
 import { Border, Color, FontSize, Padding } from '../components/styles/GlobalStyles';
+import { axiosAuthGet } from '../configs';
+import { accessTokenKey } from '../constants/constant';
+import { AppContext } from '../contexts';
 
 const ToolbarEmployee = () => {
-  const navigation = useNavigation();
   return (
     <View style={styles.nameScreenAndBtnAdd}>
       <View style={styles.textFlexBox}>
         <Text style={styles.dashboard}>Nhân viên</Text>
         <Image style={styles.logoEvent} source={require('../assets/icon--employee2.png')} />
       </View>
-      <TouchableOpacity onPress={() => navigation.navigate('AddEmployee')}>
-        <Image style={styles.buttonFab} source={require('../assets/plus-icon.png')} />
-      </TouchableOpacity>
     </View>
   );
 };
@@ -25,11 +25,44 @@ const ToolbarEmployee = () => {
 const EmployeeScreen = () => {
   const [searchPhrase, setSearchPhrase] = useState('');
   const [clicked, setClicked] = useState(false);
-  const [fakeData, setFakeData] = useState([]);
+  const [data, setData] = useState([]);
+  const [isModalIndicator, setIsModalIndicator] = useState(true);
+  const { checkData, pagination, loadingFooter, deleteEmployees } = useContext(AppContext);
+  const [dataChange, setDataChange] = checkData;
+  const [pageData, setPageData] = pagination;
+  const [isLoading, setIsLoading] = loadingFooter;
 
   useEffect(() => {
-    setFakeData(DummyDataEmployee);
-  }, []);
+    (async () => {
+      const token = await AsyncStorage.getItem(accessTokenKey);
+
+      const respone = await axiosAuthGet('/employee/get-employee-list', token, {
+        limit: 7,
+        page: pageData,
+      });
+
+      if (respone) {
+        const listEmployee = respone.listEmployee;
+        if (pageData === 1) {
+          setData(prevData => [...prevData, ...listEmployee]);
+        } else {
+          const dataMore = listEmployee.map(employ => {
+            const employs = employ;
+            data.push(employs);
+          });
+          if (dataMore) {
+            setIsLoading(false);
+          }
+          return dataMore;
+        }
+        setIsModalIndicator(false);
+      }
+      if (respone.listEmployee.length === 0) {
+        setIsLoading(false);
+      }
+    })();
+    console.log(data);
+  }, [pageData]);
 
   return (
     <View style={styles.container}>
@@ -40,7 +73,15 @@ const EmployeeScreen = () => {
         clicked={clicked}
         setClicked={setClicked}
       />
-      <List searchPhrase={searchPhrase} data={fakeData} setClicked={setClicked} />
+      {isModalIndicator ? (
+        <ActivityIndicator
+          size={40}
+          color={Color.primary}
+          style={{ height: '80%', justifyContent: 'center' }}
+        />
+      ) : (
+        <List searchPhrase={searchPhrase} data={data} setClicked={setClicked} />
+      )}
     </View>
   );
 };
@@ -50,7 +91,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 812,
     paddingVertical: Padding.p_base,
-    paddingHorizontal: Padding.p_5xl,
+    paddingHorizontal: 20,
     alignItems: 'center',
     flex: 1,
     backgroundColor: Color.colorWhite,
@@ -60,6 +101,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'stretch',
+    paddingVertical: 10,
   },
   textFlexBox: {
     flexDirection: 'row',

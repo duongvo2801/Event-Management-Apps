@@ -83,19 +83,31 @@ const BottomNavigation = () => {
 const Tab = createBottomTabNavigator();
 const HomeNavigation = () => {
   const [isEmployee, setIsEmployee] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   useEffect(() => {
     (async () => {
       const accessToken = await getAccessToken();
       const respone = await axiosAuthGet('/employee/get-employee-profile', accessToken);
-      if (respone) {
-        // if (respone.employee.auth.role.name !== 'Admin') {
-        //   setIsEmployee(true);
-        // }
+      if (respone && respone.data && respone.data.employee) {
+        if (respone.data.employee.name === 'Administrator') {
+          setIsEmployee(false);
+        } else {
+          setIsEmployee(true);
+        }
         setIsLoading(false);
       }
+      // if (respone && respone.data && respone.data.employee) {
+      //   if (respone.data.employee.name === 'Administrator') {
+      //     setIsEmployee(false);
+      //   } else {
+      //     setIsEmployee(true);
+      //   }
+      //   setIsLoading(false);
+      // }
     })();
-  });
+  }, []);
+  console.log(isEmployee);
+
   return isLoading ? (
     <View style={{ flex: 1, justifyContent: 'center' }}>
       <ActivityIndicator size={48} color={Color.primary} />
@@ -132,6 +144,8 @@ const HomeNavigation = () => {
         backgroundColor: 'red',
         borderTopWidth: 0,
       })}>
+      <Tab.Screen name="Event" component={EventScreen} options={{ title: 'Sự kiện' }} />
+
       <Tab.Screen name="Profile" component={ProfileScreen} options={{ title: 'Cá nhân' }} />
     </Tab.Navigator>
   ) : (

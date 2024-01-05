@@ -6,7 +6,7 @@ import { AuthNavigation, BottomNavigation } from './index';
 import { AppContext } from '../contexts';
 
 const AppNavigation = () => {
-  const { isLogin, setIsLogin } = useContext(AppContext);
+  const { isLogin } = useContext(AppContext);
 
   return (
     <NavigationContainer>{isLogin ? <BottomNavigation /> : <AuthNavigation />}</NavigationContainer>

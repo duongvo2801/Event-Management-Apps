@@ -5,9 +5,6 @@ export const AppContext = createContext();
 export const AppContextProvider = props => {
   const { children } = props;
   const [isLogin, setIsLogin] = useState(false);
-
-  const [isFirstLogin, setIsFirstLogin] = useState(false);
-
   const [data, setIsData] = useState([]);
   const [isModalVisible, setisModalVisible] = useState(false);
   const popup = [isModalVisible, setisModalVisible];
@@ -21,6 +18,9 @@ export const AppContextProvider = props => {
   const [pageData, setPageData] = useState(1);
   const pagination = [pageData, setPageData];
 
+  const [isLoading, setIsLoading] = useState(false);
+  const loadingFooter = [isLoading, setIsLoading];
+
   const [isEmployee, setIsEmployee] = useState(false);
   const checkAcount = [isEmployee, setIsEmployee];
 
@@ -31,14 +31,13 @@ export const AppContextProvider = props => {
       value={{
         isLogin,
         setIsLogin,
-        isFirstLogin,
-        setIsFirstLogin,
         data,
         setIsData,
         popup,
         dataIdEmployee,
         checkData,
         pagination,
+        loadingFooter,
         checkAcount,
         deleteEmployees,
       }}>

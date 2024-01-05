@@ -48,23 +48,23 @@ const LoginScreen = () => {
     }
 
     console.log(response);
-    if (response.auth_id || response.username) {
-      if (response.username) {
-        setIsLogin(true);
-      } else {
-        await AsyncStorage.setItem(authIdKey, response.auth_id);
-        navigation.navigate('AddEmployee', { email: inputs.email });
-      }
-      // if (setIsFirstLogin) {
-      //   // Check if response.auth_id is not null or undefined before setting it
-      //   if (response.auth_id !== null && response.auth_id !== undefined) {
-      //     await AsyncStorage.setItem(authIdKey, response.auth_id);
-      //   }
-      //   navigation.navigate('AddEmployee', { email: inputs.email });
-      // } else {
-      //   setIsLogin(true);
-      // }
+    // if (response.auth_id || response.username) {
+    if (response) {
+      setIsLogin(true);
+    } else {
+      await AsyncStorage.setItem(authIdKey, response.auth_id);
+      navigation.navigate('AddEmployee', { email: inputs.email });
     }
+    // if (setIsFirstLogin) {
+    //   // Check if response.auth_id is not null or undefined before setting it
+    //   if (response.auth_id !== null && response.auth_id !== undefined) {
+    //     await AsyncStorage.setItem(authIdKey, response.auth_id);
+    //   }
+    //   navigation.navigate('AddEmployee', { email: inputs.email });
+    // } else {
+    //   setIsLogin(true);
+    // }
+    // }
   };
 
   return (
